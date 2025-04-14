@@ -21,6 +21,6 @@ public class CollectionsIndexerApp {
         // TODO 1: Implement this method as specified.  You may use any collections and functions
         //  from `java.util` and `java.io`.  Do not define any new classes (stick with Java's
         //  collection types).  You may ignore all I/O errors.
-        throw new UnsupportedOperationException();
+
     }
 }
