@@ -1,0 +1,38 @@
+# Assignment 5 reflection
+
+## Submitter metadata
+
+Partner 1: Firstname Lastname (NetID)  - TODO
+Partner 2: Firstname Lastname (NetID)  - delete if working solo
+
+Hours spent working on this assignment: 0.0  - TODO
+
+## Verification questions
+
+In the "menus" folder of your project, you'll find dinner menus from seven of Cornell's dining
+halls on Wednesday, March 26 (information from https://now.dining.cornell.edu/eateries). Use your
+IndexerApp to answer the following questions about these menus.
+
+1. Which dining halls were serving quinoa that night?
+
+   Answer: TODO
+
+2. On how many lines of North Star's menu does "chicken" appear?
+
+   Answer: TODO
+
+3. Only one dining hall was serving a sausage pizza. Which one?
+
+   Answer: TODO
+
+## Reflection questions
+
+1. For a single source with N words of a fixed length, what is the expected asymptotic complexity of
+   your `CollectionsIterator` solution in terms of N? (you will need to read the JavaDoc pages for
+   the collections and methods you used in order to know their complexity claims)  Explain your
+   reasoning.
+
+2. What is the **worst-case** time complexity of TwoPassIndexer in terms of N, the total number of
+   words across all files?  What algorithmic substitution would improve this worst-case complexity,
+   and what would the new complexity be?
+
