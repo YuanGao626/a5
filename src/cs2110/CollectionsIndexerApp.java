@@ -21,6 +21,66 @@ public class CollectionsIndexerApp {
         // TODO 1: Implement this method as specified.  You may use any collections and functions
         //  from `java.util` and `java.io`.  Do not define any new classes (stick with Java's
         //  collection types).  You may ignore all I/O errors.
+        Map<String, Map<String, Set<Integer>>> index = new HashMap<>();
+        Set<String> files = new HashSet<>();
+
+        Collections.addAll(files, args);
+
+        for (String eachFile : files){
+            File file = new File(eachFile);
+            try (Scanner scanner = new Scanner(file)) {
+                int lineIndex = 0;
+                while (scanner.hasNextLine()){
+                    lineIndex++;
+                    String line = scanner.nextLine();
+                    String[] words = line.split("\\s+");
+                    for (String word : words){
+                        if (word.isEmpty()){
+                            continue;
+                        }
+                        word = word.toUpperCase();
+
+                        if(!index.containsKey(word)){
+                            index.put(word, new HashMap<>());
+                        }
+
+                        Map<String, Set<Integer>> fileMap = index.get(word);
+
+                        if (!fileMap.containsKey(eachFile)){
+                            fileMap.put(eachFile, new HashSet<>());
+                        }
+
+                        fileMap.get(eachFile).add(lineIndex);
+
+                    }
+                }
+            }
+        }
+
+        List<String> sortedWords = new ArrayList<>(index.keySet());
+        Collections.sort(sortedWords);
+
+        for (String word : sortedWords){
+            System.out.println(word);
+
+            Map<String, Set<Integer>> fileMap = index.get(word);
+
+            List<String> sortedFIles = new ArrayList<>(fileMap.keySet());
+            Collections.sort(sortedFIles);
+
+            for (String file : sortedFIles){
+                System.out.print("\t" + file);
+
+                List<Integer> sortedLines = new ArrayList<>(fileMap.get(file));
+                Collections.sort(sortedLines);
+
+                for(int line : sortedLines){
+                    System.out.print(" " + line);
+                }
+
+                System.out.println();
+            }
+        }
 
     }
 }
