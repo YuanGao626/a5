@@ -58,6 +58,57 @@ abstract class StringDictTest {
     //  test suite will be evaluated on whether or not it catches common bugs.
     //  If you plan to complete the `TrieStringDict` challenge extension, be sure these tests only
     //  use keys with capital letters and digits.
+
+    @DisplayName("Overwriting an existing key does not increase size")
+    @Test
+    void testOverwriteKey() {
+        StringDict<String> dict = makeDict();
+        dict.put("HELLO", "world");
+        dict.put("HELLO", "universe");
+
+        assertEquals(1, dict.size());
+        assertTrue(dict.containsKey("HELLO"));
+        assertEquals("universe", dict.get("HELLO"));
+    }
+
+    @DisplayName("get() throws NoSuchElementException when key is missing")
+    @Test
+    void testGetMissingKeyThrows() {
+        StringDict<Integer> dict = makeDict();
+        assertThrows(NoSuchElementException.class, () -> dict.get("MISSING"));
+    }
+
+    @DisplayName("Multiple unique keys can be stored and retrieved")
+    @Test
+    void testMultipleKeys() {
+        StringDict<Integer> dict = makeDict();
+        dict.put("A", 1);
+        dict.put("B", 2);
+        dict.put("C", 3);
+
+        assertEquals(3, dict.size());
+        assertEquals(1, dict.get("A"));
+        assertEquals(2, dict.get("B"));
+        assertEquals(3, dict.get("C"));
+    }
+
+    @DisplayName("Iterator returns all inserted values exactly once")
+    @Test
+    void testIteratorContents() {
+        StringDict<String> dict = fromMap(Map.of(
+                "A", "a",
+                "B", "b",
+                "C", "c"
+        ));
+
+        Set<String> values = new HashSet<>();
+        for (String val : dict) {
+            values.add(val);
+        }
+
+        assertEquals(Set.of("a", "b", "c"), values);
+    }
+
 }
 
 /**
@@ -91,6 +142,73 @@ class ProbingStringDictTest extends StringDictTest {
     void testLoadFactorEmpty() {
         ProbingStringDict<Integer> dict = makeDict();
         assertEquals(0, dict.loadFactor());
+    }
+
+    @DisplayName("findEntry returns empty slot for new key")
+    @Test
+    void testFindEntry_NewKey() {
+        ProbingStringDict<Integer> dict = makeDict();
+        int index = dict.findEntry("A");
+        assertNull(dict.entries[index]);
+    }
+
+    @DisplayName("findEntry returns correct index for existing key")
+    @Test
+    void testFindEntry_ExistingKey() {
+        ProbingStringDict<Integer> dict = makeDict();
+        dict.put("Z", 9);
+        int index = dict.findEntry("Z");
+        assertEquals("Z", dict.entries[index].key());
+    }
+
+    @DisplayName("containsKey returns true if key is found")
+    @Test
+    void testContainsKey_Found() {
+        ProbingStringDict<Integer> dict = makeDict();
+        dict.put("KEY1", 111);
+        assertTrue(dict.containsKey("KEY1"));
+    }
+
+    @DisplayName("containsKey returns false for missing key")
+    @Test
+    void testContainsKey_NotFound() {
+        ProbingStringDict<Integer> dict = makeDict();
+        assertFalse(dict.containsKey("NOPE"));
+    }
+
+    @DisplayName("get returns value if key is found")
+    @Test
+    void testGet_Found() {
+        ProbingStringDict<Integer> dict = makeDict();
+        dict.put("ITEM", 42);
+        assertEquals(42, dict.get("ITEM"));
+    }
+
+    @DisplayName("get throws if key is missing")
+    @Test
+    void testGet_NotFound() {
+        ProbingStringDict<Integer> dict = makeDict();
+        assertThrows(NoSuchElementException.class, () -> dict.get("MISSING"));
+    }
+
+    @DisplayName("put adds new key and increases size")
+    @Test
+    void testPut_AddNew() {
+        ProbingStringDict<Integer> dict = makeDict();
+        assertEquals(0, dict.size());
+        dict.put("X", 1);
+        assertEquals(1, dict.size());
+        assertEquals(1, dict.get("X"));
+    }
+
+    @DisplayName("put updates existing key without increasing size")
+    @Test
+    void testPut_Overwrite() {
+        ProbingStringDict<Integer> dict = makeDict();
+        dict.put("X", 1);
+        dict.put("X", 99);
+        assertEquals(1, dict.size());
+        assertEquals(99, dict.get("X"));
     }
 
 }

@@ -79,7 +79,17 @@ public class ProbingStringDict<V> implements StringDict<V> {
         // TODO 12: Implement this method as specified.  We expect the only methods you need will be
         //  `String.charAt()` and `String.length()`, though `Math` functions would be fine too.  Do
         //  not use `hashCode()` or `Objects.hash()` or `Arrays.hashCode()`.  Be creative!
-        throw new UnsupportedOperationException();
+        int even = 0, odd = 0;
+
+        for (int i = 0; i < key.length(); i++) {
+            if (i % 2 == 0) {
+                even += key.charAt(i);
+            } else {
+                odd += key.charAt(i);
+            }
+        }
+
+        return (even * 3 + odd * 7) & 0x7FFFFFFF;
     }
 
     /**
@@ -88,7 +98,7 @@ public class ProbingStringDict<V> implements StringDict<V> {
      */
     protected double loadFactor() {
         // TODO 13: Implement this method as specified.
-        throw new UnsupportedOperationException();
+        return (double) size / entries.length;
     }
 
     /**
@@ -99,26 +109,62 @@ public class ProbingStringDict<V> implements StringDict<V> {
      */
     protected int findEntry(String key) {
         // TODO 14: Implement this method as specified.
-        throw new UnsupportedOperationException();
+        int index = hash(key) % entries.length;
+
+        for(int i=0; i<entries.length; i++){
+            Entry<String, V> entry = entries[index];
+
+            if (entry == null){
+                return index;
+            } else if (entry.key.equals(key)){
+                return index;
+            }
+
+            index = (index + 1) % entries.length;
+        }
+
+        throw new NoSuchElementException("Table is full, key can't be placed");
     }
 
     @Override
     public boolean containsKey(String key) {
         // TODO 15: Implement this method as specified.  `findEntry()` will probably be useful.
-        throw new UnsupportedOperationException();
+        int index = findEntry(key);
+
+        if(entries[index] != null && entries[index].key.equals(key)){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public V get(String key) {
         // TODO 16: Implement this method as specified.  `findEntry()` will probably be useful.
-        throw new UnsupportedOperationException();
+        int index = findEntry(key);
+
+        if(entries[index] == null || !entries[index].key.equals(key)){
+            throw new NoSuchElementException();
+        }
+
+        return entries[index].value;
     }
 
     @Override
     public void put(String key, V value) {
         // TODO 17: Implement this method as specified.  `findEntry()` will probably be useful.
         //  You may define additional (private) helper methods as well if you like.
-        throw new UnsupportedOperationException();
+        assert key != null;
+        assert value != null;
+
+        int index = findEntry(key);
+
+        if(entries[index] == null){
+            entries[index] = new Entry<>(key, value);
+            size++;
+        } else {
+            entries[index] = new Entry<>(key, value);
+        }
     }
 
     @Override
