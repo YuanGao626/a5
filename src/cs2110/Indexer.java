@@ -49,7 +49,20 @@ public abstract class Indexer {
     void writeIndex(Iterable<WordOccurrences> index, PrintWriter out) {
         // TODO 2: Implement this method as specified.  You may only use methods declared in
         //  `WordOccurrences`, `SourceLines`, `PrintWriter`, and `Iterable`/`Iterator`.
-        throw new UnsupportedOperationException();
+        for(WordOccurrences word : index){
+            out.println(word.word());
+
+            for(SourceLines source : word.sources()){
+                out.print("\t" + source.sourceName());
+
+                for(int line : source.lines()){
+                    out.print(" " + line);
+                }
+
+                out.println();
+            }
+        }
+
     }
 
     /**

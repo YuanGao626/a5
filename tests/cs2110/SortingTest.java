@@ -38,6 +38,25 @@ class SortingTest {
 
         // TODO 5: Write at least two additional testcases to thoroughly cover
         //  `deduplicateSorted()`.
+
+        @DisplayName("If all elements are the same it will only keep 1 copy")
+        @Test
+        void testAllSame() {
+            IndexedSeq<String> items = makeSeq("1", "1", "1","1");
+            Sorting.deduplicateSorted(items);
+
+            assertIterableEquals(List.of("1"), items);
+
+        }
+
+        @DisplayName("Remove duplicates and keeps order")
+        @Test
+        void testRemoveDups() {
+            IndexedSeq<String> items = makeSeq("1", "1", "2","2", "3", "3");
+            Sorting.deduplicateSorted(items);
+
+            assertIterableEquals(List.of("1", "2", "3"), items);
+        }
     }
 
     // Tests of `med3()` from A1.  You are welcome to add additional testcases if you like.

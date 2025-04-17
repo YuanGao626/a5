@@ -14,7 +14,20 @@ public class Sorting {
     public static <T> void deduplicateSorted(IndexedSeq<T> items) {
         // TODO 4: Implement this method as specified.  You may only call methods declared in
         //  `IndexedSeq` or `Object`.
-        throw new UnsupportedOperationException();
+        if(items.isEmpty()){
+            return;
+        }
+
+        int j=0;
+
+        for(int i=0; i< items.size(); i++){
+            if(!items.get(i).equals(items.get(j))){
+                j++;
+                items.set(j, items.get(i));
+            }
+        }
+
+        items.truncate(j+1);
     }
 
     /**
