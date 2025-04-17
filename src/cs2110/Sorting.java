@@ -47,7 +47,13 @@ public class Sorting {
     static <T extends Comparable<? super T>> T med3(T a, T b, T c) {
         // TODO 6: Implement this method as specified.  You may only call methods declared in
         //  `Comparable` or `Object`.
-        throw new UnsupportedOperationException();
+        if ((a.compareTo(b) <= 0 && b.compareTo(c) <= 0) || (c.compareTo(b) <= 0 && b.compareTo(a) <= 0)) {
+            return b;
+        } else if ((b.compareTo(a) <= 0 && a.compareTo(c) <= 0) || (c.compareTo(a) <= 0 && a.compareTo(b) <= 0)) {
+            return a;
+        } else {
+            return c;
+        }
     }
 
     /**
@@ -63,7 +69,34 @@ public class Sorting {
         //  of the first, middle, and last values of the input range as the pivot, and use
         //  `partitionShiftedDiscardPivot()` for the partitioning step.  You may only call methods
         //  declared in `IndexedSeq` or `IPair`, as well as other methods in `Sorting`.
-        throw new UnsupportedOperationException();
+        if (begin >= end){
+            return dst;
+        }
+
+        T pivot = choosePivot(items, begin, end);
+
+        IPair result = partitionShiftedDiscardPivot(items, begin, end, dst, pivot);
+        int i = result.i();
+        int j = result.j();
+
+        int lessThanPivot = quicksortDistinct(items, dst, i, dst);
+        items.set(lessThanPivot, pivot);
+        int greaterThanPivot = quicksortDistinct(items, j, end, lessThanPivot + 1);
+
+        return greaterThanPivot;
+
+    }
+
+    /** Helper method for quicksortDistinct, chooses the pivot by calling the med3 method given the first,
+     * middle, and last element in the items seq
+     * */
+    private static <T extends Comparable<? super T>> T choosePivot(
+            IndexedSeq<T> items, int begin, int end) {
+        int mid = begin + (end - begin) / 2;
+        T first = items.get(begin);
+        T middle = items.get(mid);
+        T last = items.get(end - 1);
+        return med3(first, middle, last);
     }
 
     /**
@@ -79,7 +112,32 @@ public class Sorting {
         // TODO 7: Implement this method as specified.  You may only call methods declared in
         //  `IndexedSeq`, `Comparable`, or `Object`, as well as `IPair`'s constructor.  Write a
         //  comment documenting your loop invariant above the initialization of your loop variables.
-        throw new UnsupportedOperationException();
+
+        //Loop invariant: [dst..i) - contains elements < pivot, [k..j) - area we haven't gotten to yet,
+        //[i..j] - all elements that are == to pivot, [j..end) - all the elements > pivot
+
+        int i = dst;
+        int j = end;
+        int k = begin;
+
+        while (k < j) {
+            T current = items.get(k);
+            int comparison = current.compareTo(pivot);
+
+            if (comparison < 0){
+                items.set(i, current);
+                i++;
+                k++;
+            } else if (comparison > 0){
+                j--;
+                items.set(k, items.get(j));
+                items.set(j, current);
+            } else {
+                k++;
+            }
+        }
+
+        return new IPair(i, j);
     }
 
     /**

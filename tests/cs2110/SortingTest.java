@@ -142,6 +142,58 @@ class SortingTest {
         //  DisplayNames and/or comments to clearly indicate which situations are being covered in
         //  each case.  Be careful not to assert more than is guaranteed by the spec (any valid
         //  implementation must pass your tests).
+
+        @Test
+        @DisplayName("pivot is not present; dst == begin; end < items.size()")
+        void testNoPivotPresent() {
+            IndexedSeq<Integer> items = makeSeq(99, 1, 2, 3, 42);
+            int originalSize = items.size();
+
+            IPair result = Sorting.partitionShiftedDiscardPivot(items, 1, 4, 1, 5);
+
+            assertEquals(originalSize, items.size());
+
+            assertEquals(4, result.i());
+            assertEquals(4, result.j());
+            assertEquals(1, items.get(1));
+            assertEquals(2, items.get(2));
+            assertEquals(3, items.get(3));
+        }
+
+        @Test
+        @DisplayName("pivot is present more than once; dst = 0")
+        void testMultiplePivots() {
+            IndexedSeq<Character> items = makeSeq('M', 'C', 'A', 'M', 'Z');
+            IPair result = Sorting.partitionShiftedDiscardPivot(items, 1, 5, 0, 'M');
+
+            assertEquals(2, result.i());
+            assertEquals(4, result.j());
+            assertEquals('Z', items.get(4));
+        }
+
+        @Test
+        @DisplayName("no values < pivot")
+        void testAllGreaterOrEqual() {
+            IndexedSeq<Integer> items = makeSeq(5, 6, 7, 5, 8);
+            IPair result = Sorting.partitionShiftedDiscardPivot(items, 0, 5, 0, 5);
+
+            assertEquals(0, result.i());
+            assertEquals(2, result.j());
+            List<Integer> greater = List.of(items.get(2), items.get(3), items.get(4));
+            assertTrue(greater.containsAll(List.of(6, 7, 8)));
+        }
+
+        @Test
+        @DisplayName("no values > pivot")
+        void testAllLessOrEqual() {
+            IndexedSeq<Integer> items = makeSeq(1, 2, 2, 1, 2);
+            IPair result = Sorting.partitionShiftedDiscardPivot(items, 0, 5, 0, 2);
+
+            assertEquals(2, result.i());
+            assertEquals(5, result.j());
+            List<Integer> less = List.of(items.get(0), items.get(1));
+            assertTrue(less.containsAll(List.of(1, 1)));
+        }
     }
 
     @DisplayName("quicksortDistinct()")
@@ -163,5 +215,23 @@ class SortingTest {
 
         // TODO 10: Write at least two additional testcases to thoroughly cover
         //  `quicksortDistinct()`.
+
+        @DisplayName("removes duplicates and sorts unsorted input")
+        @Test
+        void testUnsortedWithDuplicates() {
+            IndexedSeq<String> items = makeSeq("banana", "apple", "apple", "cherry", "banana");
+            Sorting.sortDistinct(items);
+
+            assertIterableEquals(List.of("apple", "banana", "cherry"), items);
+        }
+
+        @DisplayName("removes all but one when all values are the same")
+        @Test
+        void testAllSameValues() {
+            IndexedSeq<Character> items = makeSeq('X', 'X', 'X', 'X');
+            Sorting.sortDistinct(items);
+
+            assertIterableEquals(List.of('X'), items);
+        }
     }
 }
