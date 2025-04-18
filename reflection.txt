@@ -41,3 +41,8 @@ IndexerApp to answer the following questions about these menus.
    words across all files?  What algorithmic substitution would improve this worst-case complexity,
    and what would the new complexity be?
 
+        The worst case time complexity of the TwoPassIndexer method is algo O(NlogN), this is because it goes
+        through a binary search which becomes the becomes the bottle neck at that time. This could be reduced
+        by replacing the binary search and sorted list with a hashtable instead, with would decrease it to just
+        O(N) which was the time complexity of adding all words into the dynamic array.
+
