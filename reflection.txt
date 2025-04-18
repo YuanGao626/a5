@@ -2,10 +2,10 @@
 
 ## Submitter metadata
 
-Partner 1: Firstname Lastname (NetID)  - TODO
-Partner 2: Firstname Lastname (NetID)  - delete if working solo
+Partner 1: Firstname Lastname (NetID)  - Ivan Zheng iz56
+Partner 2: Firstname Lastname (NetID)  - Yuan Gao yg626
 
-Hours spent working on this assignment: 0.0  - TODO
+Hours spent working on this assignment: 11.0
 
 ## Verification questions
 
@@ -15,15 +15,15 @@ IndexerApp to answer the following questions about these menus.
 
 1. Which dining halls were serving quinoa that night?
 
-   Answer: TODO
+   Answer: 104west, morrison, and okenshields
 
 2. On how many lines of North Star's menu does "chicken" appear?
 
-   Answer: TODO
+   Answer: 3 lines (7, 19, 23)
 
 3. Only one dining hall was serving a sausage pizza. Which one?
 
-   Answer: TODO
+   Answer: northstar
 
 ## Reflection questions
 
@@ -31,6 +31,11 @@ IndexerApp to answer the following questions about these menus.
    your `CollectionsIterator` solution in terms of N? (you will need to read the JavaDoc pages for
    the collections and methods you used in order to know their complexity claims)  Explain your
    reasoning.
+
+        The expected complexity of my CollectionsIterator would be O(NlogN). The initial putting words
+        into the hashmap and set takes O(N) time due to a for loop through words. But the part of the code
+        where we actually output we needed to use the .sort method which has a average and worst time complexity
+        of O(NlogN) which becomes our bottleneck and therefore making the entire methods time complexity O(NlogN).
 
 2. What is the **worst-case** time complexity of TwoPassIndexer in terms of N, the total number of
    words across all files?  What algorithmic substitution would improve this worst-case complexity,
