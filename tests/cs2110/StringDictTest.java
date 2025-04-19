@@ -213,16 +213,14 @@ class ProbingStringDictTest extends StringDictTest {
 
 }
 
-// TODO (challenge extension): Uncomment this after implementing `TrieStringDict`.
+/**
+ * Test suite for `TrieStringDict`.  Only valid if superclass restricts keys to strings containing
+ * only capital letters and digits.
+ */
+class TrieStringDictTest extends StringDictTest {
 
-///**
-// * Test suite for `TrieStringDict`.  Only valid if superclass restricts keys to strings containing
-// * only capital letters and digits.
-// */
-//class TrieStringDictTest extends StringDictTest {
-//
-//    @Override
-//    <V> StringDict<V> makeDict() {
-//        return new TrieStringDict<>();
-//    }
-//}
+    @Override
+    <V> StringDict<V> makeDict() {
+        return new TrieStringDict<>();
+    }
+}
