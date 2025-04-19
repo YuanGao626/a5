@@ -1,30 +1,23 @@
 package cs2110;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException; // Required for get()
+import java.util.NoSuchElementException; // Allowed dependency
 
 /**
- * A Dictionary using a Trie. Keys are Strings of 'A'-'Z' and '0'-'9'.
- * Implements the cs2110.StringDict interface.
- *
+ * A Dictionary using a Trie, implementing StringDict<V>.
+ * Keys must be Strings containing only 'A'-'Z' and '0'-'9'.
  * @param <V> The type of values stored.
  */
 public class TrieStringDict<V> implements StringDict<V> {
 
-    private static final int ALPHABET_SIZE = 36; // '0'-'9' + 'A'-'Z'
+    private static final int ALPHABET_SIZE = 36; // For '0'-'9' and 'A'-'Z'
 
     /** Represents a node in the Trie. */
     private static class TrieNode<V> {
-        TrieNode<V>[] children; // Child nodes for next characters
-        boolean isEndOfWord;    // Does this node mark the end of a stored key?
-        V value;                // Value if this node is the end of a key
-
-        /** Creates a new TrieNode. */
         @SuppressWarnings("unchecked")
-        TrieNode() {
-            children = (TrieNode<V>[]) new TrieNode<?>[ALPHABET_SIZE];
-            // isEndOfWord defaults to false, value defaults to null
-        }
+        TrieNode<V>[] children = (TrieNode<V>[]) new TrieNode<?>[ALPHABET_SIZE];
+        boolean isEndOfWord = false;
+        V value = null;
     }
 
     private final TrieNode<V> root; // Root of the Trie
@@ -36,20 +29,27 @@ public class TrieStringDict<V> implements StringDict<V> {
         size = 0;
     }
 
-    /** Converts a character ('0'-'9', 'A'-'Z') to an index (0-35). */
+    /** Converts a valid character ('0'-'9', 'A'-'Z') to an index (0-35). */
     private int charToIndex(char c) {
         if (c >= '0' && c <= '9') return c - '0';
         if (c >= 'A' && c <= 'Z') return c - 'A' + 10;
         throw new IllegalArgumentException("Invalid character for Trie key: " + c);
     }
 
-    /** Finds the node for the given key. Returns null if key prefix not found. */
-    private TrieNode<V> getNode(String key) {
+    /** Finds the node corresponding to the key. Returns null if prefix not found. */
+    private TrieNode<V> findNode(String key) {
         TrieNode<V> current = root;
         for (int i = 0; i < key.length(); i++) {
-            int index = charToIndex(key.charAt(i));
+            int index;
+            try {
+                index = charToIndex(key.charAt(i));
+            } catch (IllegalArgumentException e) {
+                throw e;
+            }
             current = current.children[index];
-            if (current == null) return null;
+            if (current == null) {
+                return null; // Prefix doesn't exist
+            }
         }
         return current;
     }
@@ -60,26 +60,25 @@ public class TrieStringDict<V> implements StringDict<V> {
     }
 
     /**
-     * Requires: `key` is not null and contains only '0'-'9' or 'A'-'Z'.
-     * @throws NoSuchElementException if `key` is not found in the dictionary.
+     * Requires `key` is not null.
+     * @throws NoSuchElementException if `key` is not found.
      * @throws NullPointerException if `key` is null.
      * @throws IllegalArgumentException if `key` contains invalid characters.
      */
     @Override
     public V get(String key) {
-        if (key == null) throw new NullPointerException("Key cannot be null");
-        TrieNode<V> node = getNode(key); // Handles illegal chars
+        if (key == null) {
+            throw new NullPointerException("Key cannot be null");
+        }
+        TrieNode<V> node = findNode(key);
         if (node != null && node.isEndOfWord) {
-            if (node.value == null) {
-                throw new NoSuchElementException("Key found but value is unexpectedly null: " + key);
-            }
             return node.value;
         }
         throw new NoSuchElementException("Key not found: " + key);
     }
 
     /**
-     * Requires: `key` and `value` are not null. `key` contains only '0'-'9' or 'A'-'Z'.
+     * Requires: `key` and `value` are not null.
      * @throws NullPointerException if `key` or `value` is null.
      * @throws IllegalArgumentException if `key` contains invalid characters.
      */
@@ -98,29 +97,35 @@ public class TrieStringDict<V> implements StringDict<V> {
         }
 
         if (!current.isEndOfWord) {
-            // Key is new
             size++;
             current.isEndOfWord = true;
         }
-        // Set/update the value
         current.value = value;
     }
 
     /**
-     * Requires: `key` is not null and contains only '0'-'9' or 'A'-'Z'.
+     * Requires `key` is not null.
      * @throws NullPointerException if `key` is null.
      * @throws IllegalArgumentException if `key` contains invalid characters.
      */
     @Override
     public boolean containsKey(String key) {
-        if (key == null) throw new NullPointerException("Key cannot be null");
-        TrieNode<V> node = getNode(key);
+        if (key == null) {
+            throw new NullPointerException("Key cannot be null");
+        }
+        TrieNode<V> node = null;
+        try {
+            node = findNode(key);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
         return node != null && node.isEndOfWord;
     }
 
+
     /**
-     * Returns an iterator over the values in this dictionary.
-     * Order is undefined. Iterator does not support remove().
+     * Returns an iterator over the *values* stored in the dictionary.
+     * Order is undefined.
      * @return an Iterator over the values (`V`).
      */
     @Override
@@ -130,19 +135,17 @@ public class TrieStringDict<V> implements StringDict<V> {
         return values.iterator();
     }
 
-    /** Recursively collects all non-null values into the `values` sequence. */
-    private void collectValues(TrieNode<V> node, DynamicArrayIndexedSeq<V> values) {
-        if (node == null) {
-            return;
-        }
+    /** Recursively collects values from the Trie into the sequence. */
+    private void collectValues(TrieNode<V> node, DynamicArrayIndexedSeq<V> valueList) {
+        if (node == null) return;
 
         if (node.isEndOfWord) {
-            values.add(node.value);
+            valueList.add(node.value);
         }
 
-        for (int i = 0; i < ALPHABET_SIZE; i++) {
-            if (node.children[i] != null) {
-                collectValues(node.children[i], values);
+        for (TrieNode<V> child : node.children) {
+            if (child != null) {
+                collectValues(child, valueList);
             }
         }
     }
