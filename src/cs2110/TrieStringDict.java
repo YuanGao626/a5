@@ -1,10 +1,12 @@
 package cs2110;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException; // Needed for get()
+import java.util.NoSuchElementException; // Required for get()
 
 /**
  * A Dictionary using a Trie. Keys are Strings of 'A'-'Z' and '0'-'9'.
+ * Implements the cs2110.StringDict interface.
+ *
  * @param <V> The type of values stored.
  */
 public class TrieStringDict<V> implements StringDict<V> {
@@ -14,14 +16,14 @@ public class TrieStringDict<V> implements StringDict<V> {
     /** Represents a node in the Trie. */
     private static class TrieNode<V> {
         TrieNode<V>[] children; // Child nodes for next characters
-        boolean isEndOfWord;
-        V value;
+        boolean isEndOfWord;    // Does this node mark the end of a stored key?
+        V value;                // Value if this node is the end of a key
 
         /** Creates a new TrieNode. */
+        @SuppressWarnings("unchecked")
         TrieNode() {
             children = (TrieNode<V>[]) new TrieNode<?>[ALPHABET_SIZE];
-            isEndOfWord = false;
-            value = null;
+            // isEndOfWord defaults to false, value defaults to null
         }
     }
 
@@ -39,12 +41,6 @@ public class TrieStringDict<V> implements StringDict<V> {
         if (c >= '0' && c <= '9') return c - '0';
         if (c >= 'A' && c <= 'Z') return c - 'A' + 10;
         throw new IllegalArgumentException("Invalid character for Trie key: " + c);
-    }
-
-    /** Converts an index (0-35) back to a character ('0'-'9', 'A'-'Z'). */
-    private char indexToChar(int index) {
-        if (index >= 0 && index <= 9) return (char) ('0' + index);
-        return (char) ('A' + (index - 10));
     }
 
     /** Finds the node for the given key. Returns null if key prefix not found. */
@@ -74,9 +70,11 @@ public class TrieStringDict<V> implements StringDict<V> {
         if (key == null) throw new NullPointerException("Key cannot be null");
         TrieNode<V> node = getNode(key); // Handles illegal chars
         if (node != null && node.isEndOfWord) {
+            if (node.value == null) {
+                throw new NoSuchElementException("Key found but value is unexpectedly null: " + key);
+            }
             return node.value;
         }
-        // Key not found or path exists but isn't marked as a word end
         throw new NoSuchElementException("Key not found: " + key);
     }
 
@@ -109,7 +107,6 @@ public class TrieStringDict<V> implements StringDict<V> {
     }
 
     /**
-     * {@inheritDoc}
      * Requires: `key` is not null and contains only '0'-'9' or 'A'-'Z'.
      * @throws NullPointerException if `key` is null.
      * @throws IllegalArgumentException if `key` contains invalid characters.
@@ -117,15 +114,14 @@ public class TrieStringDict<V> implements StringDict<V> {
     @Override
     public boolean containsKey(String key) {
         if (key == null) throw new NullPointerException("Key cannot be null");
-        TrieNode<V> node = getNode(key); // Handles illegal chars
+        TrieNode<V> node = getNode(key);
         return node != null && node.isEndOfWord;
     }
 
     /**
      * Returns an iterator over the values in this dictionary.
-     * The order of iteration is undefined.
-     * The `remove` operation is not supported by this iterator.
-     * @return an Iterator over the values (`V`) stored in the dictionary.
+     * Order is undefined. Iterator does not support remove().
+     * @return an Iterator over the values (`V`).
      */
     @Override
     public Iterator<V> iterator() {
@@ -134,12 +130,14 @@ public class TrieStringDict<V> implements StringDict<V> {
         return values.iterator();
     }
 
-    /** Recursively collects all values into the `values` sequence. */
+    /** Recursively collects all non-null values into the `values` sequence. */
     private void collectValues(TrieNode<V> node, DynamicArrayIndexedSeq<V> values) {
-        if (node == null) return; // Should not happen with root but just in case
+        if (node == null) {
+            return;
+        }
 
         if (node.isEndOfWord) {
-            values.add(node.value); // Add the value itself
+            values.add(node.value);
         }
 
         for (int i = 0; i < ALPHABET_SIZE; i++) {

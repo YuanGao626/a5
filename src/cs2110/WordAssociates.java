@@ -41,7 +41,6 @@ public class WordAssociates {
                 }
             }
 
-            // Update counts if they co-occurred
             if (coOccurrenceCount > 0) {
                 updateCounts(candidateWords, candidateCounts, potentialAssociateUpperWord, coOccurrenceCount);
             }
